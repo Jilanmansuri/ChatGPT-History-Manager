@@ -8,12 +8,11 @@ A minimal browser extension that adds a **History Manager** panel to [ChatGPT](h
 
 ## Features
 
-- **Sync all chats** — Pulls your full conversation list via ChatGPT’s authenticated APIs (paginated, with gentle rate limiting) and caches it in the browser.
-- **Search** — Filter by title or by date using `YYYY-MM-DD`. Multiple space-separated terms act as AND filters.
-- **Activity graph** — Yearly heatmap of chat activity; hover for counts, click a day to jump the search to that date.
+- **Sync all chats** — Fetches your full conversation list via ChatGPT’s authenticated APIs (paginated, with gentle rate limiting) for the active page session.
+- **Search** — Filter by title or by the displayed conversation date.
 - **Bulk selection** — Check individual rows or use **Select Visible** to target everything that matches the current search.
 - **Bulk delete** — Removes selected conversations (same soft-hide behavior ChatGPT uses when you delete a chat).
-- **Native-feeling UI** — Floating action button, draggable header, resizable panel, keyboard-friendly list with links that open chats in-app.
+- **In-app links** — Open a conversation from the list without leaving ChatGPT.
 
 ## Requirements
 
@@ -32,11 +31,9 @@ The extension only runs on `https://chatgpt.com/*`.
 ## Usage
 
 1. Go to [chatgpt.com](https://chatgpt.com) and sign in.
-2. Click the **clock** button in the bottom-right corner to open **History Manager**.
+2. Click the **trash** button in the bottom-right corner to open **History Manager**.
 3. Click **Sync All Chats** to fetch or refresh the list (first open may sync automatically if the cache is empty).
-4. Use the search box, heatmap, and checkboxes as needed; **Delete Selected** asks for confirmation before removing chats.
-
-Cached data is stored in `localStorage` under the key `cgm_chats` in the ChatGPT origin.
+4. Use the search box, date range, and checkboxes as needed; **Delete Selected** asks for confirmation before removing chats.
 
 ## How it works
 
@@ -51,7 +48,7 @@ ChatGPT’s web app and APIs can change at any time; this project is **not** aff
 ## Privacy
 
 - The extension runs **only** on `chatgpt.com` pages you open.
-- Conversation metadata is kept **locally** in your browser until you clear site data or remove the extension.
+- Conversation metadata is kept in memory while the ChatGPT page is open; it is not saved to persistent storage.
 - Network calls use your **existing** logged-in session—the extension does not send data to third-party servers.
 
 ## Contributing

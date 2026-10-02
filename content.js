@@ -665,16 +665,12 @@ function formatDate(
   dateString
 ) {
 
-  if (!dateString) {
-
-    return "Unknown";
-
-  }
-
-
   const date =
-    new Date(dateString);
+    parseChatDate(dateString);
 
+  if (!date) {
+    return "Unknown";
+  }
 
   return date.toLocaleDateString(
     "en-IN",
@@ -688,6 +684,77 @@ function formatDate(
 }
 
 
+function parseChatDate(
+  value
+) {
+
+  if (
+    value === null ||
+    value === undefined ||
+    value === ""
+  ) {
+
+    return null;
+
+  }
+
+
+  let date;
+
+
+  if (
+    typeof value === "number" ||
+    (
+      typeof value === "string" &&
+      /^\d+(?:\.\d+)?$/.test(value.trim())
+    )
+  ) {
+
+    let timestamp =
+      Number(value);
+
+
+    if (!Number.isFinite(timestamp)) {
+
+      return null;
+
+    }
+
+
+    // ChatGPT timestamps are commonly Unix seconds, not milliseconds.
+    if (Math.abs(timestamp) < 1e12) {
+
+      timestamp *= 1000;
+
+    }
+
+
+    date =
+      new Date(timestamp);
+
+  } else if (
+    typeof value === "string"
+  ) {
+
+    date =
+      new Date(value);
+
+  } else {
+
+    return null;
+
+  }
+
+
+  return Number.isNaN(
+    date.getTime()
+  )
+    ? null
+    : date;
+
+}
+
+
 // ============================================================
 // DATE CHECK
 // ============================================================
@@ -696,22 +763,20 @@ function isDateInRange(
   chat
 ) {
 
-  if (!chat.update_time) {
+  if (!startDate && !endDate) {
 
-    return false;
+    return true;
 
   }
 
 
   const chatDate =
-    new Date(
+    parseChatDate(
       chat.update_time
     );
 
 
-  if (Number.isNaN(
-    chatDate.getTime()
-  )) {
+  if (!chatDate) {
 
     return false;
 
@@ -786,19 +851,23 @@ function matchesSearch(
 
   const title =
     (
-      chat.title || ""
+      String(chat.title || "")
     ).toLowerCase();
 
 
   const date =
     (
-      chat.update_time || ""
+      String(chat.update_time || "")
     ).toLowerCase();
+
+  const formattedDate =
+    formatDate(chat.update_time).toLowerCase();
 
 
   return (
     title.includes(searchText) ||
-    date.includes(searchText)
+    date.includes(searchText) ||
+    formattedDate.includes(searchText)
   );
 
 }
